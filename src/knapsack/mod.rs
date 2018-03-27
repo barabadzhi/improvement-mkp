@@ -8,6 +8,8 @@ pub mod neighborhood;
 use self::rand::{thread_rng, Rng};
 use self::rayon::prelude::*;
 
+use colored::*;
+
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::time::Instant;
@@ -97,7 +99,7 @@ impl Knapsack {
         knapsack
     }
 
-    pub fn run_greedy(&self) -> Statistics {
+    pub fn run_greedy(&self, improvements: usize) -> Statistics {
         let mut items = self.items.clone();
         let mut capacity_left = self.capacity.clone();
         let mut result = Statistics::new();
@@ -129,6 +131,7 @@ impl Knapsack {
         }
 
         result.duration = time.elapsed();
+        result.picked_items.sort();
         result.runs = 1;
 
         for (left, total) in capacity_left.iter().zip(self.capacity.iter()) {
@@ -138,15 +141,24 @@ impl Knapsack {
             ))
         }
 
-        {
-            let neighborhood = Neighborhood::new(&self.items, &result);
-            println!("{}\n{:?}", neighborhood.neighbors.len(), neighborhood.neighbors);
+        let mut improvement_result = result.clone();
+
+        for _ in 0..improvements {
+            let time = Instant::now();
+            improvement_result = {
+                let neighborhood = Neighborhood::new(&self.items, &improvement_result);
+                neighborhood.best_neighbor(&self.capacity)
+            };
+            improvement_result.duration = time.elapsed();
+            improvement_result.runs = improvements;
         }
+
+        println!("{}{}", "Improved Greedy".cyan().bold(), improvement_result);
 
         result
     }
 
-    pub fn run_random(&self, runs: usize) -> Statistics {
+    pub fn run_random(&self, runs: usize, improvements: usize) -> Statistics {
         let mut instances = Vec::with_capacity(runs);
         let mut indexes: Vec<usize> = (0..self.items.len()).collect();
         let result = RwLock::new(Statistics::new());
@@ -201,7 +213,22 @@ impl Knapsack {
         let mut result = result.into_inner().unwrap();
 
         result.duration = time.elapsed();
+        result.picked_items.sort();
         result.runs = runs;
+
+        let mut improvement_result = result.clone();
+
+        for _ in 0..improvements {
+            let time = Instant::now();
+            improvement_result = {
+                let neighborhood = Neighborhood::new(&self.items, &improvement_result);
+                neighborhood.best_neighbor(&self.capacity)
+            };
+            improvement_result.duration = time.elapsed();
+            improvement_result.runs = improvements;
+        }
+
+        println!("{}{}", "Improved Random".cyan().bold(), improvement_result);
 
         result
     }
