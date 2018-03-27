@@ -3,6 +3,7 @@ extern crate rayon;
 
 pub mod item;
 pub mod statistics;
+pub mod neighborhood;
 
 use self::rand::{thread_rng, Rng};
 use self::rayon::prelude::*;
@@ -14,6 +15,7 @@ use std::sync::RwLock;
 
 use self::item::Item;
 use self::statistics::Statistics;
+use self::neighborhood::Neighborhood;
 
 #[derive(Default, Debug)]
 pub struct Knapsack {
@@ -134,6 +136,11 @@ impl Knapsack {
                 "{:.2}%",
                 ((f64::from(*total - *left) / f64::from(*total)) * 100_f64)
             ))
+        }
+
+        {
+            let neighborhood = Neighborhood::new(&self.items, &result);
+            println!("{}\n{:?}", neighborhood.neighbors.len(), neighborhood.neighbors);
         }
 
         result
