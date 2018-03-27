@@ -6,7 +6,7 @@ use colored::*;
 #[derive(Default, Debug, Clone)]
 pub struct Statistics {
     pub total_profit: u32,
-    pub picked_items: Vec<String>,
+    pub picked_items: Vec<u32>,
     pub utilization: Vec<String>,
     pub runs: usize,
     pub duration: Duration,
@@ -55,7 +55,7 @@ impl fmt::Display for Statistics {
 "#,
             self.total_profit.to_string().green(),
             self.picked_items.len(),
-            self.picked_items.join(", ").yellow(),
+            format!("{:?}", self.picked_items).yellow(),
             self.utilization.join(" ").blue(),
             self.runs.to_string().cyan(),
             run_time

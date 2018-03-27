@@ -85,7 +85,7 @@ impl Knapsack {
             let weighted_profit = f64::from(profit) / f64::from(item_weights.iter().sum::<u32>());
 
             knapsack.items.push(Item {
-                id: index + 1,
+                id: index as u32 + 1,
                 profit,
                 weights: item_weights.into_boxed_slice(),
                 weighted_profit,
@@ -121,7 +121,7 @@ impl Knapsack {
                     *constraint -= item.weights[index];
                 }
 
-                result.picked_items.push(item.id.to_string());
+                result.picked_items.push(item.id);
                 result.total_profit += item.profit;
             }
         }
@@ -174,7 +174,7 @@ impl Knapsack {
 
                     internal_result
                         .picked_items
-                        .push(self.items[*index].id.to_string());
+                        .push(self.items[*index].id);
                     internal_result.total_profit += self.items[*index].profit;
                 }
             }

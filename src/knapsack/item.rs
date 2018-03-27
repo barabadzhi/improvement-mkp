@@ -2,7 +2,7 @@ use std::cmp::Ordering;
 
 #[derive(Debug, PartialEq, PartialOrd, Clone)]
 pub struct Item {
-    pub id: usize,
+    pub id: u32,
     pub profit: u32,
     pub weights: Box<[u32]>,
     pub weighted_profit: f64,
